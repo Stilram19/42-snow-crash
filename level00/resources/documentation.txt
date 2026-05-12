@@ -1,0 +1,30 @@
+# according the the video in elearning, we should find the first file whose owner is flag00
+
+level00@SnowCrash:~$ find / -type f -user flag00 2>/dev/null
+/usr/sbin/john
+/rofs/usr/sbin/john
+level00@SnowCrash:~$ cat /usr/sbin/john
+cdiiddwpgswtgt
+level00@SnowCrash:~$ su flag00
+Password: 
+su: Authentication failure
+
+# if a user other than 'flag00' runs 'getflag' this is the output:
+$ getflag
+Check flag.Here is your token : 
+Nope there is no token here for you sorry. Try again :)
+
+# now we need to decrypt 'cdiiddwpgswtgt', if we try rot11 the result is 'notthathard'
+level00@SnowCrash:~$ echo 'cdiiddwpgswtgt' | tr 'a-z' 'l-za-k'
+nottoohardhere
+level00@SnowCrash:~$ su flag00
+Password: 
+Don't forget to launch getflag !
+flag00@SnowCrash:~$
+
+# now I am 'flag00' so I can run 'getflag' to get the flag to next level
+flag00@SnowCrash:~$ getflag
+Check flag.Here is your token : x24ti5gi3x0ol2eh4esiuxias
+flag00@SnowCrash:~$ su level01
+Password: 
+level01@SnowCrash:~$ 
