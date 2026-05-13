@@ -1,0 +1,32 @@
+# by inspecting the /etc/passwd file, we get access easily to the stored hashed password of user 'flag01'
+# this is how traditional unix systems stored password: /etc/passwd stored hashed passwords. but in modern systems all hashed passwords are stored in /etc/shadow
+# which is only accessible by the root.
+# we will perform an offline attack using 'John the ripper' trying to crack the password of user 'flag01'
+
+# let's get the 'flag01' user's record from 'passwd' database
+level01@SnowCrash:~$ getent passwd flag01
+flag01:42hDRfypTqqnw:3001:3001::/home/flag/flag01:/bin/bash
+
+# the hashed password is: '42hDRfypTqqnw'
+
+# in the host machine (where I have sudo access) I will install and use 'John the ripper' to crack the hashed password
+host-machine$ john level01/resources/passwd.txt
+Loaded 1 password hash (descrypt, traditional crypt(3) [DES 128/128 SSE2])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+abcdefg          (?)
+1g 0:00:00:00 100% 2/3 16.66g/s 273066p/s 273066c/s 273066C/s 123456..betabeta
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed
+
+# 'abcdefg' is the password of user 'flag01' and it's very weak (cracked immediately using John The Ripper)
+
+# let's move to next level
+level01@SnowCrash:~$ su flag01
+Password: 
+Don't forget to launch getflag !
+flag01@SnowCrash:~$ getflag
+Check flag.Here is your token : f2av5il02puano7naaf6adaaf
+flag01@SnowCrash:~$ su level02
+Password: 
+level02@SnowCrash:~$ 
