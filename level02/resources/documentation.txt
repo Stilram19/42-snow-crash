@@ -1,0 +1,30 @@
+# in the home directory there's a PCAP file, which is basically a capture of raw network traffic at a given moment, it can include many raw network packets
+# in this file, 95 packets were captured, when we open the file with wireshark, we notice that all of them are in TCP protocol
+# so it could be a TCP stream. Using Wireshark follow TCP stream, we recognize an unencrypted interactive login (maybe TELNET protocol)
+# the password is clear but there are a couple of dot characters which could be non-printable characters
+# when we change the view to a hexdump, we reveal that these dot characters are DEL in ascii (0x7f), which means we need to delete a few characters from
+# the password we saw in ASCII view, and that's it.
+
+# copy the PCAP file from the VM to the host machine
+scp -P 4242 level02@localhost:./level02.pcap ./level02.pcap
+
+# open the PCAP file with wireshark and right click the first packet, click follow, click TCP stream
+# you'll get the whole TCP stream in ASCII view by default
+# you can see the password, but the password isn't clear with ASCII view, we need hexdump view to be able to see non-printable characters also
+
+# password in ASCII view: 'ft_wandr...NDRel.L0L'
+
+# in the hexdump it's clear that we need to delete a few characters in order to get the final password of user 'flag02' (becuase '.' characters are 0x7f which is DELETE in ASCII)
+
+# the real password is 'ft_waNDReL0L'
+
+level02@SnowCrash:~$ su flag02
+Password: 
+Don't forget to launch getflag !
+flag02@SnowCrash:~$ getflag
+Check flag.Here is your token : kooda2puivaav1idi4f57q8iq
+flag02@SnowCrash:~$ su level03
+Password: 
+level03@SnowCrash:~$ 
+
+# level03 unlocked
