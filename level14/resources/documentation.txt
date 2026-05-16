@@ -1,0 +1,59 @@
+# in this level nothing is there, no hints, no files belonging to flag14, nothing...
+# we will try to trace /bin/getflag with gdb like we did in the previous level
+
+# by dissassembling the main function, we see that getflag is protecting itself from tracing using ptrace
+
+# we will set a breakpoint then at ptrace syscall and alter the return value with 0 (which means ptrace successfully returned and there no problem)
+
+(gdb) break ptrace
+Breakpoint 1 at 0x8048540
+(gdb) run
+Starting program: /bin/getflag 
+
+Breakpoint 1, 0xb7f146d0 in ptrace () from /lib/i386-linux-gnu/libc.so.6
+(gdb) step
+Single stepping until exit from function ptrace,
+which has no line number information.
+0x0804898e in main ()
+(gdb) print $eax
+$1 = -1
+(gdb) set $eax = 0
+(gdb) print $eax
+$2 = 0
+
+# but there's still another obstacle which is the getuid call to check who's running getflag
+# we will set a breakpoint at getuid and change our UID with flag14's UID
+
+(gdb) break getuid
+Breakpoint 2 at 0xb7ee4cc0
+(gdb) step
+Single stepping until exit from function main,
+which has no line number information.
+
+Breakpoint 2, 0xb7ee4cc0 in getuid () from /lib/i386-linux-gnu/libc.so.6
+(gdb) print $eax
+$3 = 32
+(gdb) step
+Single stepping until exit from function getuid,
+which has no line number information.
+0x08048b02 in main ()
+(gdb) print $eax
+$4 = 2014
+(gdb) set $eax = 3014
+(gdb) print $eax
+$5 = 3014
+(gdb) step
+Single stepping until exit from function main,
+which has no line number information.
+Check flag.Here is your token : 7QiHafiNa3HVozsaXkawuYrTstxbpABHD8CPnHJ
+0xb7e454d3 in __libc_start_main () from /lib/i386-linux-gnu/libc.so.6
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 6728] will be killed.
+
+Quit anyway? (y or n) y
+level14@SnowCrash:~$ su flag14
+Password: 
+Congratulation. Type getflag to get the key and send it to me the owner of this livecd :)
+
