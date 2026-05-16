@@ -1,0 +1,47 @@
+# token is readable this time but it looks encrypted (not all bytes are ASCII encoded)
+level09@SnowCrash:~$ ls -l
+total 12
+-rwsr-sr-x 1 flag09 level09 7640 Mar  5  2016 level09
+----r--r-- 1 flag09 level09   26 Mar  5  2016 token
+level09@SnowCrash:~$ cat token
+f4kmm6p|=�p�n��DB�Du{��
+level09@SnowCrash:~$ hexdump -C token
+00000000  66 34 6b 6d 6d 36 70 7c  3d 82 7f 70 82 6e 83 82  |f4kmm6p|=..p.n..|
+00000010  44 42 83 44 75 7b 7f 8c  89 0a                    |DB.Du{....|
+0000001a
+level09@SnowCrash:~$ 
+
+# at the other hand level09 executable encodes the first input arg by adding the index of each character to itself
+# this could be the hint to this level: what if the token was encoded with ./level09 executable
+# I wrote a script that decodes the other way, it subtracts the index of each character from itself
+# in the host machine:
+
+➜  ~ scp -P 4242 level09@localhost:~/token .
+	   _____                      _____               _     
+	  / ____|                    / ____|             | |    
+	 | (___  _ __   _____      _| |     _ __ __ _ ___| |__  
+	  \___ \| '_ \ / _ \ \ /\ / / |    | '__/ _` / __| '_ \ 
+	  ____) | | | | (_) \ V  V /| |____| | | (_| \__ \ | | |
+	 |_____/|_| |_|\___/ \_/\_/  \_____|_|  \__,_|___/_| |_|
+                                                        
+  Good luck & Have fun
+
+          10.0.2.15 fd17:625c:f037:2:4511:1959:7f3e:1cf2 fd17:625c:f037:2:a00:27ff:fefb:4f39 
+level09@localhost's password: 
+token                                                                                                                                      100%   26    29.0KB/s   00:00    
+➜  ~ python3 decrypt.py token
+f3iji1ju5yuevaus41q1afiuq
+
+# I must note that I removed a space character from the end of the token file (the only disturbing character that couldn't decode to an ASCII character)
+# now back to the VM
+
+level09@SnowCrash:~$ su flag09
+Password: 
+Don't forget to launch getflag !
+flag09@SnowCrash:~$ getflag
+Check flag.Here is your token : s5cAJpM8ev6XHw998pRWG728z
+flag09@SnowCrash:~$ su level10
+Password: 
+level10@SnowCrash:~$ 
+
+# level10 unlocked
